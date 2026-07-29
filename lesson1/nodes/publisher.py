@@ -7,7 +7,8 @@ class Publisher:
 
     def __init__(self):
         self.message = rospy.get_param('~message', 'Hello World!')
-        self.rate = rospy.Rate(rospy.get_param('~rate', 2)) # returns 10 times per second 
+        self.rate_hz = rospy.get_param('~rate', 2)
+        self.rate = rospy.Rate(self.rate_hz)
         self.pub = rospy.Publisher('/message', String, queue_size=10)
 
     def run(self):
