@@ -59,8 +59,6 @@ class PurePursuitFollower:
 
     def current_pose_callback(self, msg):
         if self.path_linestring is None or self.distance_to_velocity_interpolator is None:
-            # Print out the current pose coordinates to verify data flow.
-            # print(msg.pose.position.x, msg.pose.position.y)
 
             steering_angle = 0.0
             linear_velocity = 0.0
@@ -69,7 +67,6 @@ class PurePursuitFollower:
             # Calculate the ego vehicle's distance from the path start.
             current_pose = Point([msg.pose.position.x, msg.pose.position.y])
             d_ego_from_path_start = self.path_linestring.project(current_pose)
-            print(d_ego_from_path_start)
 
             # Calculate the steering angle using the Pure Pursuit formula.
             # Get heading from current pose orientation
@@ -83,7 +80,7 @@ class PurePursuitFollower:
                 lookahead_point.x - msg.pose.position.x
             )
             # Recalculate the actual lookahead distance (direct distance between points)
-            ld = distance(Point([msg.pose.position.x, msg.pose.position.y]), lookahead_point)
+            ld = distance(current_pose, lookahead_point)
 
             # Calculate steering angle using the Pure Pursuit formula
             steering_angle = np.arctan2(
