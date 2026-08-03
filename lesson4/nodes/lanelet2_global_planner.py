@@ -151,7 +151,27 @@ class GlobalPlanner:
                 projected_waypoint.position.z = waypoints[-1].position.z
                 projected_waypoint.speed = waypoints[-1].speed
 
-                waypoints[-1] = projected_waypoint
+                # Truncate the waypoints list to remove points extending past the goal
+                truncated_waypoints = []
+                cumulative_dist = 0.0
+
+                for i, wp in enumerate(waypoints):
+                    if i > 0:
+                        p1 = waypoints[i-1].position
+                        p2 = wp.position
+                        dist = np.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
+                        cumulative_dist += dist
+
+                    # Only keep waypoints that are strictly before the projected distance
+                    if cumulative_dist < projected_distance:
+                        truncated_waypoints.append(wp)
+                    else:
+                        break
+
+                # Append the exact projected waypoint as the final point
+                truncated_waypoints.append(projected_waypoint)
+                waypoints = truncated_waypoints
+
                 self.goal_point = BasicPoint2d(projected_waypoint.position.x,
                                                projected_waypoint.position.y)
 
