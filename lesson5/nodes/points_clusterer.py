@@ -15,7 +15,7 @@ class PointsClusterer:
         self.cluster_epsilon = rospy.get_param('~cluster_epsilon')
         self.cluster_min_samples = rospy.get_param('~cluster_min_samples')
 
-        # TODO 1: Create self.clusterer using DBSCAN with the parameters above.
+        # Create self.clusterer using DBSCAN with the parameters above.
         self.clusterer = DBSCAN(eps=self.cluster_epsilon, min_samples=self.cluster_min_samples)
 
         # Publishers
@@ -28,12 +28,7 @@ class PointsClusterer:
 
     def points_callback(self, msg):
 
-        # TODO 1: Extract points from the message and cluster them.
-        #         - Use numpify(msg) to convert the PointCloud2 message to a numpy array
-        #         - Use structured_to_unstructured()
-        #           to get an (N, 3) array of point coordinates
-        #         - Run self.clusterer.fit_predict(points) to get cluster labels
-        #         - Skip empty point clouds (0 points) - DBSCAN cannot cluster them
+        # --- Extract points from the message and cluster them --- 
         data = numpify(msg) # numpify (msg) converts the PointCloud2 message to a numpy array 
 
         # Skip empty point clouds (0 points) - DBSCAN cannot cluster them
@@ -43,17 +38,13 @@ class PointsClusterer:
         points = structured_to_unstructured(data[['x', 'y', 'z']], dtype=np.float32)
         labels = self.clusterer.fit_predict(points) # Run self.clusterer.fit_predict(points) to get cluster labels 
 
-        # TODO 2: Publish the clustered points as a PointCloud2 message.
-        #         - Concatenate points with labels (as a new column)
-        #         - Filter out noise points (label == -1)
-        
+        # --- Publish the clustered points as a PointCloud2 message --- 
         # Concatenate points with labels
         points_labeled = np.column_stack([points, labels])
 
         # Filter out noise points (label == -1)
         points_labeled = points_labeled[labels != -1]
 
-        #         - Convert to structured array with unstructured_to_structured()
         # Convert to structured with unstructured_to_structured()
         data = unstructured_to_structured(points_labeled, dtype=np.dtype([
             ('x', np.float32),
@@ -65,13 +56,11 @@ class PointsClusterer:
         #         - Use msgify(PointCloud2, data) to create the message
         #         - Set header stamp and frame_id from the input message
         #         - Publish with self.clustered_pub
-        out_msg = msgify(PointCloud2, data)
-        out_msg.header.stamp = msg.header.stamp
-        out_msg.header.frame_id = msg.header.frame_id
+        out_msg = msgify(PointCloud2, data) # Create the msg using msgify(PointCloud2, data)
+        out_msg.header.stamp = msg.header.stamp # Set header stamp from the input message
+        out_msg.header.frame_id = msg.header.frame_id # Set header frame_id from the input message
 
-        self.clustered_pub.publish(out_msg)
-
-        pass
+        self.clustered_pub.publish(out_msg) # Publish the message with self.clustered_pub
 
     def run(self):
         rospy.spin()
