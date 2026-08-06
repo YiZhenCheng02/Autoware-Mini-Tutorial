@@ -66,10 +66,16 @@ Your framework from the previous lessons is a simplified one. Remember all limit
 5. Commit and push everything, and be ready to demonstrate your failure cases at the practice session
 
 ##### Failure case 1
-...
+* **Scenario:** An NPC vehicle traveling in an adjacent lane attempts to change lanes (cut-in) right in front of the ego vehicle.
+* **Failure:** The ego vehicle did not detect that the other vehicle was trying to change lanes until it was fully in its path. It failed to anticipate the lateral movement and maintain a safe following distance, resulting in a near collision.
+* **Proposed Fix:** Add a lane change detection feature to notice when adjacent cars start moving sideways, along with an adaptive speed controller to slow our car down early when a cut-in is detected. 
 
 ##### Failure case 2
-...
+* **Scenario:** A jaywalking person suddenly sprints directly in front of the ego vehicle.
+* **Failure:** The ego vehicle's perception and planning loops react too late. The pure pursuit follower and basic velocity controller cannot overcome the vehicle's forward momentum fast enough to stop, leading to a crash with the jaywalker.
+* **Proposed Fix:** Add a fast-reacting Automatic Emergency Braking (AEB) system. This would bypass the normal, slower driving controls to slam on the brakes the moment a sudden collision risk is detected.
 
 ##### Failure case 3
-...
+* **Scenario:** A stationary car is parked directly in front of the ego vehicle, mimicking a broken-down vehicle blocking the lane.
+* **Failure:** The ego vehicle successfully detects the obstacle and stops, but it fails to change lanes. Ego car is stuck indefinitely and cannot continue the scenario. 
+* **Proposed Fix:** Add a dynamic local path planner. Instead of just stopping because the pre-drawn map line is blocked, this would allow the car to calculate a temporary detour to safely steer around the broken-down car.
